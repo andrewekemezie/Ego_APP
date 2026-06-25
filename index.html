@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ekemezie Budget - Professional Wealth Architecture</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Chart.js for visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Tailwind CSS for modern spacing and components -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --bg-canvas: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-muted: #64748b;
+            --border-ui: #e2e8f0;
+            --brand-primary: #1e3a8a;
+            --shape-opacity: 0.08;
+        }
+
+        .dark {
+            --bg-canvas: #090d16;
+            --bg-card: #131c2e;
+            --text-primary: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-ui: #1e293b;
+            --brand-primary: #3b82f6;
+            --shape-opacity: 0.15;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-primary);
+            transition: background-color 0.4s ease, color 0.3s ease;
+        }
+
+        .custom-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-ui);
+            transition: background-color 0.4s ease, border-color 0.3s ease;
+        }
+
+        /* Abstract professional vector background elements */
+        .ambient-shape {
+            position: absolute;
+            background: linear-gradient(135deg, rgba(59, 130, 246, var(--shape-opacity)) 0%, rgba(30, 58, 138, calc(var(--shape-opacity) * 0.5)) 100%);
+            border-radius: 43% 57% 60% 40% / 45% 48% 52% 55%;
+            z-index: -1;
+            filter: blur(12px);
+            transition: background 0.4s ease;
+        }
+        .shape-alpha {
+            width: 750px;
+            height: 750px;
+            top: -280px;
+            right: -200px;
+        }
+        .shape-beta {
+            width: 550px;
+            height: 550px;
+            bottom: -180px;
+            left: -150px;
+            border-radius: 60% 40% 50% 50% / 50% 50% 50% 60%;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 md:p-10 relative overflow-x-hidden">
+
+    <!-- Backdrop designs -->
+    <div class="ambient-shape shape-alpha no-print"></div>
+    <div class="ambient-shape shape-beta no-print"></div>
+
+    <div class="w-full max-w-xl custom-card rounded-2xl shadow-xl p-6 md:p-10 z-10" id="budget-app-card">
+        
+        <!-- TARGETED AREA FOR EXPORT: Begins exactly at the name, ends below chart -->
+        <div id="printable-content" class="w-full">
+            
+            <header class="flex justify-between items-center pb-6 mb-6 border-b border-[var(--border-ui)]">
+                <div>
+                    <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent dark:from-blue-400 dark:to-indigo-300">
+                        Ekemezie Budget
+                    </h1>
+                    <p class="text-xs font-semibold uppercase tracking-widest text-[var(--text-muted)] mt-1">
+                        Premium Financial Architecture
+                    </p>
+                </div>
+                
+                <div class="flex items-center gap-2 no-print">
+                    <!-- API Settings Config Button -->
+                    <button id="settings-toggler" class="w-11 h-11 rounded-full flex items-center justify-center border border-[var(--border-ui)] hover:bg-blue-50 dark:hover:bg-slate-800 transition-all text-blue-600 dark:text-blue-400" title="API Settings">
+                        <i class="fa-solid fa-gear text-lg"></i>
+                    </button>
+                    <!-- Theme Toggler -->
+                    <button id="theme-toggler" class="w-11 h-11 rounded-full flex items-center justify-center border border-[var(--border-ui)] hover:bg-blue-50 dark:hover:bg-slate-800 transition-all text-blue-600 dark:text-blue-400" title="Switch Theme">
+                        <i class="fa-solid fa-moon text-lg" id="theme-icon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Fiscal Calendar and Income Panel -->
+            <div class="custom-card rounded-xl p-5 mb-6 bg-slate-50/50 dark:bg-slate-900/30 border-blue-500/10">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="budget-month" class="block text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-2">Fiscal Period</label>
+                        <input type="month" id="budget-month" class="w-full bg-[var(--bg-card)] border border-[var(--border-ui)] rounded-lg p-3 text-sm font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-[var(--text-primary)] transition-all">
+                    </div>
+                    <div>
+                        <label for="income-input" class="block text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-2">Total Monthly Income</label>
+                        <div class="relative flex items-center">
+                            <span class="absolute left-3.5 font-semibold text-[var(--text-muted)]">£</span>
+                            <input type="number" id="income-input" step="0.01" placeholder="0.00" class="w-full bg-[var(--bg-card)] border border-[var(--border-ui)] rounded-lg py-3 pl-8 pr-4 text-sm font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-[var(--text-primary)] transition-all">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Expenditures List -->
+            <div class="custom-card rounded-xl p-5 mb-6">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-[var(--border-ui)]">
+                    <h3 class="text-md font-bold text-blue-600 dark:text-blue-400 flex items-center gap-2">
+                        <i class="fa-solid fa-wallet text-sm"></i> Monthly Expenditures
+                    </h3>
+                    <button id="append-expense-btn" class="w-8 h-8 rounded-full bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 flex items-center justify-center hover:scale-105 transition-all no-print" title="Add custom commitment">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                    </button>
+                </div>
+                
+                <div id="expenses-list" class="space-y-3 max-h-[280px] overflow-y-auto pr-1">
+                    <!-- Loaded dynamically via script -->
+                </div>
+            </div>
+
+            <div id="audit-results-wrapper" class="border-t-2 border-dashed border-[var(--border-ui)] pt-6 mt-6 hidden">
+                <h2 class="text-lg font-extrabold text-center mb-5 tracking-tight">
+                    Monthly Financial Audit <span id="audit-month-label" class="text-sm font-normal text-[var(--text-muted)]"></span>
+                </h2>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <!-- Total Expenses KPI (Vibrant Red) -->
+                    <div class="custom-card p-4 rounded-xl border-l-4 border-red-500 shadow-sm">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Total Expenses</span>
+                        <span id="expenses-kpi" class="block text-xl font-extrabold mt-1 text-red-600 dark:text-red-400">£0.00</span>
+                    </div>
+                    <!-- Target Savings Status (Emerald Green) -->
+                    <div class="custom-card p-4 rounded-xl border-l-4 border-emerald-500 shadow-sm">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Target Savings (50%)</span>
+                        <span id="savings-kpi" class="block text-xl font-extrabold mt-1 text-emerald-600 dark:text-emerald-400">£0.00</span>
+                    </div>
+                    <!-- Remaining Allowance Status (Blue) -->
+                    <div id="allowance-kpi-container" class="custom-card p-4 rounded-xl border-l-4 border-blue-500 shadow-sm">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Leftover Allowance</span>
+                        <span id="allowance-kpi" class="block text-xl font-extrabold mt-1 text-blue-600 dark:text-blue-400">£0.00</span>
+                    </div>
+                </div>
+
+                <!-- Distribution Chart Container -->
+                <div class="relative h-64 w-full mb-6">
+                    <canvas id="financeDistributionChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+        <!-- END OF TARGETED PRINT REGION -->
+
+        <div class="grid grid-cols-2 gap-4 mb-6 no-print">
+            <button id="reset-sheet-btn" class="py-3.5 px-4 rounded-lg font-bold text-sm border border-[var(--border-ui)] text-[var(--text-muted)] hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-rotate-left"></i> Reset Sheet
+            </button>
+            <button id="compute-audit-btn" class="py-3.5 px-4 rounded-lg font-bold text-sm bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 shadow-md shadow-blue-500/15 hover:shadow-blue-500/25 transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-chart-pie"></i> Calculate
+            </button>
+        </div>
+
+        <!-- ✨ AI Wealth Advisor Panel -->
+        <div id="ai-advisor-panel" class="custom-card rounded-xl p-5 mb-6 border border-indigo-500/30 bg-gradient-to-br from-indigo-50/20 via-transparent to-blue-50/20 dark:from-indigo-950/20 dark:to-blue-950/20 shadow-md relative overflow-hidden no-print hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-extrabold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> ✨ AI Wealth Advisor
+                </h3>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-bold uppercase tracking-wider">Gemini Power</span>
+            </div>
+            <p class="text-xs text-[var(--text-muted)] mb-4">
+                Analyze your specific monthly cash flow, commitments, and 50% savings goal with advanced AI algorithms.
+            </p>
+
+            <div class="space-y-4">
+                <button id="ai-audit-btn" class="w-full py-2.5 px-4 rounded-lg font-bold text-xs bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-all flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-brain"></i> ✨ Generate AI Audit & Advice
+                </button>
+
+                <div class="border-t border-[var(--border-ui)] pt-3 mt-3">
+                    <label for="ai-custom-question" class="block text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">Ask Advisor a Specific Question</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="ai-custom-question" placeholder="e.g., How can I find £50 more to invest?" class="flex-1 bg-[var(--bg-card)] border border-[var(--border-ui)] rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-indigo-500 outline-none text-[var(--text-primary)]">
+                        <button id="ai-submit-question-btn" class="px-3.5 py-2 bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-900 rounded-lg text-xs font-bold transition-all flex items-center justify-center">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="ai-loader" class="hidden flex items-center justify-center py-4 space-x-2 text-xs text-indigo-600 dark:text-indigo-400 font-semibold">
+                    <i class="fa-solid fa-circle-notch animate-spin text-sm"></i>
+                    <span>Consulting Gemini Wealth Intelligence...</span>
+                </div>
+
+                <div id="ai-advisor-output-box" class="hidden bg-white/50 dark:bg-slate-950/50 border border-[var(--border-ui)] rounded-lg p-4 text-xs leading-relaxed max-h-[250px] overflow-y-auto">
+                    <!-- API Output Content -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="settings-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden no-print">
+        <div class="custom-card w-full max-w-md mx-4 p-6 rounded-2xl shadow-2xl relative">
+            <button id="close-settings-btn" class="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="text-lg font-extrabold mb-3 flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+                <i class="fa-solid fa-key"></i> Gemini API Configuration
+            </h3>
+            <p class="text-xs text-[var(--text-muted)] mb-4">
+                To use the ✨ AI Wealth Advisor, you must enter a valid Gemini API Key. Your key is stored locally in your browser's secure cache and is only sent directly to Google APIs.
+            </p>
+            <div class="space-y-4">
+                <div>
+                    <label for="api-key-input" class="block text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">Gemini API Key</label>
+                    <input type="password" id="api-key-input" placeholder="AIzaSy..." class="w-full bg-[var(--bg-card)] border border-[var(--border-ui)] rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-indigo-500 outline-none text-[var(--text-primary)]">
+                </div>
+                <div class="text-[11px] text-[var(--text-muted)]">
+                    Don't have a key? You can get a free API Key instantly from <a href="https://aistudio.google.com/" target="_blank" class="text-indigo-500 hover:underline font-semibold">Google AI Studio <i class="fa-solid fa-up-right-from-square text-[9px]"></i></a>.
+                </div>
+                <button id="save-settings-btn" class="w-full py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 transition-all">
+                    Save Key
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Validation Banner -->
+    <div id="validation-banner" class="fixed bottom-4 left-4 right-4 max-w-md mx-auto custom-card border-red-500 bg-red-50 dark:bg-red-950/20 p-4 rounded-xl shadow-lg z-50 flex items-start gap-3 hidden no-print">
+        <i class="fa-solid fa-circle-exclamation text-red-500 text-lg mt-0.5"></i>
+        <div class="flex-1">
+            <h4 class="text-xs font-bold text-red-600 dark:text-red-400">Missing Key Configuration</h4>
+            <p class="text-[11px] text-[var(--text-muted)] mt-1">Please configure your Google Gemini API Key inside the Settings (gear icon) menu to use AI insights.</p>
+        </div>
+        <button id="close-banner-btn" class="text-red-500 hover:opacity-75">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <script>
+        // System variables & dynamic key storage
+        let apiKey = localStorage.getItem("gemini_api_key") || "";
+        const getModelEndpoint = () => `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+        // Initialize local key value inside input
+        document.getElementById('api-key-input').value = apiKey;
+
+        // Default commitments list (Rent set to editable null value)
+        const defaultCommitments = [
+            { name: 'Rent', amount: null, fixed: false },
+            { name: 'Mother Welfare', amount: null, fixed: false },
+            { name: 'Girlfriend Support', amount: null, fixed: false },
+            { name: 'Brothers Meeting', amount: null, fixed: false },
+            { name: 'Internet Subscription', amount: null, fixed: false },
+            { name: 'Gym Membership', amount: null, fixed: false },
+            { name: 'Gift Budget', amount: null, fixed: false }
+        ];
+
+        const expensesListContainer = document.getElementById('expenses-list');
+        const themeToggler = document.getElementById('theme-toggler');
+        const themeIcon = document.getElementById('theme-icon');
+        const settingsToggler = document.getElementById('settings-toggler');
+        const settingsModal = document.getElementById('settings-modal');
+        const closeSettingsBtn = document.getElementById('close-settings-btn');
+        const saveSettingsBtn = document.getElementById('save-settings-btn');
+        const validationBanner = document.getElementById('validation-banner');
+        
+        let chartInstance = null;
+
+        // Settings togglers
+        settingsToggler.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+        closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
+        document.getElementById('close-banner-btn').addEventListener('click', () => validationBanner.classList.add('hidden'));
+
+        saveSettingsBtn.addEventListener('click', () => {
+            const keyVal = document.getElementById('api-key-input').value.trim();
+            localStorage.setItem("gemini_api_key", keyVal);
+            apiKey = keyVal;
+            settingsModal.classList.add('hidden');
+            validationBanner.classList.add('hidden');
+        });
+
+        const systemDate = new Date();
+        const yearMonthFormatted = `${systemDate.getFullYear()}-${String(systemDate.getMonth() + 1).padStart(2, '0')}`;
+        document.getElementById('budget-month').value = yearMonthFormatted;
+
+        // Injects an individual commitment field row
+        function insertExpenseRow(name = '', amount = null, isFixed = false) {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'expense-row flex items-center gap-3 w-full';
+
+            rowDiv.innerHTML = `
+                <input type="text" class="expense-desc-field bg-[var(--bg-card)] border border-[var(--border-ui)] rounded-lg p-2.5 text-xs font-semibold focus:border-blue-500 outline-none text-[var(--text-primary)] transition-all flex-[2]" placeholder="Category Description" value="${name}" ${isFixed ? 'readonly' : ''}>
+                <div class="relative flex items-center flex-[1.2]">
+                    <span class="absolute left-3 text-xs font-semibold text-[var(--text-muted)]">£</span>
+                    <input type="number" class="expense-val-field bg-[var(--bg-card)] border border-[var(--border-ui)] rounded-lg py-2.5 pl-6 pr-2.5 text-xs font-semibold focus:border-blue-500 outline-none text-[var(--text-primary)] transition-all w-full" step="0.01" placeholder="0.00" value="${amount !== null ? parseFloat(amount).toFixed(2) : ''}">
+                </div>
+                ${isFixed ? '<div class="w-8"></div>' : `
+                <button class="remove-row-btn w-8 h-8 rounded-lg flex items-center justify-center text-red-500 hover:bg-red-500/10 active:scale-95 transition-all no-print" title="Remove custom commitment">
+                    <i class="fa-solid fa-trash-can text-xs"></i>
+                </button>`}
+            `;
+
+            if (!isFixed) {
+                rowDiv.querySelector('.remove-row-btn').addEventListener('click', () => {
+                    rowDiv.remove();
+                });
+            }
+
+            expensesListContainer.appendChild(rowDiv);
+        }
+
+        // Resets the application back to a default state
+        function instantiateFreshSheet() {
+            expensesListContainer.innerHTML = '';
+            defaultCommitments.forEach(item => {
+                insertExpenseRow(item.name, item.amount, item.fixed);
+            });
+            document.getElementById('income-input').value = '';
+            document.getElementById('audit-results-wrapper').classList.add('hidden');
+            document.getElementById('ai-advisor-panel').classList.add('hidden');
+            validationBanner.classList.add('hidden');
+            if (chartInstance !== null) {
+                chartInstance.destroy();
+                chartInstance = null;
+            }
+        }
+
+        instantiateFreshSheet();
+
+        document.getElementById('append-expense-btn').addEventListener('click', () => {
+            insertExpenseRow('', null, false);
+        });
+
+        themeToggler.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            if (isDark) {
+                themeIcon.className = 'fa-solid fa-sun text-lg text-yellow-400';
+            } else {
+                themeIcon.className = 'fa-solid fa-moon text-lg text-blue-600';
+            }
+            if (chartInstance !== null) {
+                synchronizeChartPalette();
+            }
+        });
+
+        document.getElementById('reset-sheet-btn').addEventListener('click', () => {
+            instantiateFreshSheet();
+            document.getElementById('budget-month').value = yearMonthFormatted;
+        });
+
+        document.getElementById('compute-audit-btn').addEventListener('click', () => {
+            const netIncome = parseFloat(document.getElementById('income-input').value) || 0;
+            
+            let totalAccumulatedExpenses = 0;
+            const values = document.querySelectorAll('.expense-val-field');
+            values.forEach(inputField => {
+                totalAccumulatedExpenses += parseFloat(inputField.value) || 0;
+            });
+
+            const calculatedSavings = netIncome * 0.50;
+            const remainingLeftover = netIncome - calculatedSavings - totalAccumulatedExpenses;
+
+            document.getElementById('expenses-kpi').innerText = `£${totalAccumulatedExpenses.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('savings-kpi').innerText = `£${calculatedSavings.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('allowance-kpi').innerText = `£${remainingLeftover.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            const allowanceIndicator = document.getElementById('allowance-kpi-container');
+            const allowanceValueSpan = document.getElementById('allowance-kpi');
+            if (remainingLeftover < 0) {
+                allowanceIndicator.classList.remove('border-blue-500');
+                allowanceIndicator.classList.add('border-red-500');
+                allowanceValueSpan.className = 'block text-xl font-extrabold mt-1 text-red-600 dark:text-red-400';
+            } else {
+                allowanceIndicator.classList.remove('border-red-500');
+                allowanceIndicator.classList.add('border-blue-500');
+                allowanceValueSpan.className = 'block text-xl font-extrabold mt-1 text-blue-600 dark:text-blue-400';
+            }
+
+            const dateValueRaw = document.getElementById('budget-month').value;
+            if (dateValueRaw) {
+                const parsedDate = new Date(dateValueRaw + '-01');
+                const calendarMonthFormatted = parsedDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+                document.getElementById('audit-month-label').innerText = `(${calendarMonthFormatted})`;
+            } else {
+                document.getElementById('audit-month-label').innerText = '';
+            }
+
+            document.getElementById('audit-results-wrapper').classList.remove('hidden');
+            document.getElementById('ai-advisor-panel').classList.remove('hidden');
+
+            const chartContext = document.getElementById('financeDistributionChart').getContext('2d');
+            if (chartInstance !== null) {
+                chartInstance.destroy();
+            }
+
+            const activeDarkState = document.documentElement.classList.contains('dark');
+            const labelsColorHex = activeDarkState ? '#94a3b8' : '#64748b';
+
+            chartInstance = new Chart(chartContext, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Compulsory Expenses', 'Target Savings (50%)', 'Leftover Allowance'],
+                    datasets: [{
+                        data: [
+                            totalAccumulatedExpenses, 
+                            calculatedSavings, 
+                            remainingLeftover < 0 ? 0 : remainingLeftover
+                        ],
+                        backgroundColor: [
+                            '#ef4444', 
+                            '#10b981', 
+                            '#3b82f6'  
+                        ],
+                        borderWidth: activeDarkState ? 2 : 1,
+                        borderColor: activeDarkState ? '#131c2e' : '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: labelsColorHex,
+                                font: {
+                                    family: 'Inter',
+                                    size: 12,
+                                    weight: 600
+                                }
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+        });
+
+        function synchronizeChartPalette() {
+            if (chartInstance) {
+                const activeDarkState = document.documentElement.classList.contains('dark');
+                const legendLabelColor = activeDarkState ? '#94a3b8' : '#64748b';
+                chartInstance.options.plugins.legend.labels.color = legendLabelColor;
+                chartInstance.data.datasets[0].borderColor = activeDarkState ? '#131c2e' : '#ffffff';
+                chartInstance.data.datasets[0].borderWidth = activeDarkState ? 2 : 1;
+                chartInstance.update();
+            }
+        }
+
+        async function fetchWithBackoff(url, requestOptions, maxRetries = 5, baseDelay = 1000) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, requestOptions);
+                    if (response.ok) {
+                        return await response.json();
+                    }
+                    if (response.status === 429 || (response.status >= 500 && response.status < 600)) {
+                        // Retry loop logic
+                    } else {
+                        throw new Error(`Request failed with status: ${response.status}`);
+                    }
+                } catch (err) {
+                    if (i === maxRetries - 1) throw err;
+                }
+                const backoffDelay = baseDelay * Math.pow(2, i);
+                await new Promise(resolve => setTimeout(resolve, backoffDelay));
+            }
+            throw new Error("Maximum retry attempts reached.");
+        }
+
+        function convertMarkdownToHtml(rawMarkdown) {
+            let processed = rawMarkdown
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`([^`]+)`/g, '<code class="bg-indigo-50 dark:bg-slate-900 text-indigo-600 px-1 py-0.5 rounded">$1</code>')
+                .replace(/^\s*-\s+(.*)$/gm, '<li class="ml-4 list-disc my-1">$1</li>')
+                .replace(/^\s*\*\s+(.*)$/gm, '<li class="ml-4 list-disc my-1">$1</li>')
+                .replace(/\n/g, '<br>');
+            return `<div class="space-y-1">${processed}</div>`;
+        }
+
+        function extractFinancialContext() {
+            const income = parseFloat(document.getElementById('income-input').value) || 0;
+            const targetSavings = income * 0.50;
+            
+            let expensesDetails = [];
+            let totalExpenses = 0;
+            
+            const rows = document.querySelectorAll('.expense-row');
+            rows.forEach(row => {
+                const desc = row.querySelector('.expense-desc-field').value || "Unnamed Category";
+                const val = parseFloat(row.querySelector('.expense-val-field').value) || 0;
+                totalExpenses += val;
+                expensesDetails.push(`- ${desc}: £${val.toFixed(2)}`);
+            });
+
+            const leftover = income - targetSavings - totalExpenses;
+            const period = document.getElementById('budget-month').value || "Current Period";
+
+            return {
+                contextString: `
+                    Budget Cycle: ${period}
+                    Net Monthly Income: £${income.toFixed(2)}
+                    Target Savings (50% rule): £${targetSavings.toFixed(2)}
+                    Total Declared Expenses: £${totalExpenses.toFixed(2)}
+                    Leftover Spending Allowance: £${leftover.toFixed(2)}
+
+                    Declared Expenses Breakdown:
+                    ${expensesDetails.join('\n')}
+                `,
+                leftover: leftover,
+                income: income
+            };
+        }
+
+        async function runGeminiAdvisorCall(customQuestion = "") {
+            const loader = document.getElementById('ai-loader');
+            const outputContainer = document.getElementById('ai-advisor-output-box');
+            
+            if (!apiKey || apiKey.trim() === "") {
+                validationBanner.classList.remove('hidden');
+                settingsModal.classList.remove('hidden');
+                return;
+            }
+
+            loader.classList.remove('hidden');
+            outputContainer.classList.add('hidden');
+            outputContainer.innerHTML = '';
+
+            const financialData = extractFinancialContext();
+
+            if (financialData.income <= 0) {
+                loader.classList.add('hidden');
+                outputContainer.classList.remove('hidden');
+                outputContainer.innerHTML = `<span class="text-red-500 font-semibold"><i class="fa-solid fa-triangle-exclamation"></i> Please input a valid Monthly Income above before consulting the AI Wealth Advisor.</span>`;
+                return;
+            }
+
+            const systemInstructionText = "You are 'Ekemezie Wealth Advisor', a brilliant private wealth architecture strategist and elite corporate financial advisor. Your role is to analyze budget allocations with strategic accuracy. Your tone must be sophisticated, reassuring, and highly pragmatic. Address the user directly, format key recommendations using bullet points and brief professional headers. Avoid fluff.";
+
+            let promptQueryText = `
+                Analyze the following client financial statement:
+                ${financialData.contextString}
+            `;
+
+            if (customQuestion.trim() !== "") {
+                promptQueryText += `
+                    The client has asked this specific custom question: "${customQuestion}"
+                    Provide a highly precise strategic answer addressing this issue relative to their overall financial context.
+                `;
+            } else {
+                promptQueryText += `
+                    Provide a formal, complete financial evaluation. Suggest creative solutions to adjust costs if their Leftover Allowance is negative (£${financialData.leftover.toFixed(2)}). Offer ways to protect their 50% savings mandate, highlighting any high categories.
+                `;
+            }
+
+            const requestPayload = {
+                contents: [{
+                    parts: [{ text: promptQueryText }]
+                }],
+                systemInstruction: {
+                    parts: [{ text: systemInstructionText }]
+                }
+            };
+
+            try {
+                const responseData = await fetchWithBackoff(
+                    getModelEndpoint(),
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(requestPayload)
+                    }
+                );
+
+                const responseText = responseData.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (responseText) {
+                    outputContainer.innerHTML = convertMarkdownToHtml(responseText);
+                } else {
+                    outputContainer.innerHTML = `<span class="text-yellow-500">The advisor could not compile the results. Please try again.</span>`;
+                }
+            } catch (error) {
+                outputContainer.innerHTML = `
+                    <div class="text-red-500 font-medium">
+                        <i class="fa-solid fa-triangle-exclamation"></i> <strong>Consultation Error:</strong> 
+                        We were unable to establish contact with the advisor. Please check your settings key configuration and try again.
+                    </div>
+                `;
+            } finally {
+                loader.classList.add('hidden');
+                outputContainer.classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('ai-audit-btn').addEventListener('click', () => {
+            runGeminiAdvisorCall();
+        });
+
+        document.getElementById('ai-submit-question-btn').addEventListener('click', () => {
+            const queryField = document.getElementById('ai-custom-question');
+            const customQuery = queryField.value;
+            if (customQuery.trim() !== "") {
+                runGeminiAdvisorCall(customQuery);
+            }
+        });
+
+        document.getElementById('ai-custom-question').addEventListener('keydown', (e) => {
+            if (e.key === "Enter") {
+                const customQuery = e.target.value;
+                if (customQuery.trim() !== "") {
+                    runGeminiAdvisorCall(customQuery);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
